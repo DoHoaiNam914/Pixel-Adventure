@@ -11,6 +11,9 @@ public class Gameplay : MonoBehaviour
     private Rigidbody2D _rigidbody;
 
     [SerializeField]
+    private int _currentLevel;
+
+    [SerializeField]
     private Text _scoreText;
 
     [Header("Game Over Scene")]
@@ -60,15 +63,6 @@ public class Gameplay : MonoBehaviour
     {
         if (Mathf.Abs(_axisHorizontal) > 0f)
         {
-            if (_axisHorizontal > 0f)
-            {
-                _spriteRenderer.flipX = false;
-            }
-            else
-            {
-                _spriteRenderer.flipX = true;
-            }
-
             _awardStat = Stats.Run;
         }
         else
@@ -135,6 +129,7 @@ public class Gameplay : MonoBehaviour
     private void Die()
     {
         _rigidbody.bodyType = RigidbodyType2D.Static;
+        _boxCollider.enabled = false;
         _backgroundMusic.Stop();
         _deadSoundFx.Play();
         _animator.SetTrigger("Dead");
@@ -149,6 +144,11 @@ public class Gameplay : MonoBehaviour
         _backgroundMusic.Stop();
         _finalScoreText.text = $"Score: {_scorePoint}";
         _completePanel.SetActive(true);
+
+        if (_currentLevel + 1 > PlayerPrefs.GetInt("UnlockedLevel", 1))
+        {
+            PlayerPrefs.SetInt("UnlockedLevel", _currentLevel + 1);
+        }
     }
 
     public void OnRestartButtonClick()
@@ -203,10 +203,20 @@ public class Gameplay : MonoBehaviour
 
         if (_wallJumpCooldown > 0.2f)
         {
+            if (_axisHorizontal > 0f)
+            {
+                _spriteRenderer.flipX = false;
+            }
+            else if (_axisHorizontal < 0f)
+            {
+                _spriteRenderer.flipX = true;
+            }
+
             _rigidbody.velocity = new Vector2(_axisHorizontal * 10f, _rigidbody.velocity.y);
 
             if (_onWall && _rigidbody.velocity.y < 0f)
             {
+                _canDoubleJump = false;
                 _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, -0.2f);
             }
         }
@@ -219,28 +229,41 @@ public class Gameplay : MonoBehaviour
         {
             if (_canDoubleJump)
             {
-                _canDoubleJump = false;
-
                 if (!_onGround && !_onWall)
                 {
                     _isDoubleJump = true;
                 }
+
+                _canDoubleJump = false;
             }
 
             if (_onGround || _isDoubleJump)
             {
+                _jumpSoundFx.Play();
+                _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, 24f);
+
+                if (!_isDoubleJump)
+                {
+                    _canDoubleJump = true;
+                }
+            }
+            else if (_onWall)
+            {
+                bool isFacingLeft = _spriteRenderer.flipX;
+
                 if (!_isDoubleJump)
                 {
                     _canDoubleJump = true;
                 }
 
                 _jumpSoundFx.Play();
-                _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, 24f);
-            }
-            else if (_onWall)
-            {
-                _rigidbody.velocity = new Vector2(-Mathf.Sign(_spriteRenderer.flipX ? -1f : 1f) * (_spriteRenderer.flipX != (_axisHorizontal < 0f) ? 8f : (_axisHorizontal == 0f ? 4f : 2f)), 20f);
-                _spriteRenderer.flipX = !_spriteRenderer.flipX;
+                _rigidbody.velocity = new Vector2(-Mathf.Sign(isFacingLeft ? -1f : 1f) * ((isFacingLeft ? Mathf.Abs(_axisHorizontal) : _axisHorizontal) == 1f ? 2f : (isFacingLeft != (_axisHorizontal < 0f) ? 8f : 4f)), 20f);
+
+                if (isFacingLeft == (_axisHorizontal < 0f))
+                {
+                    _spriteRenderer.flipX = !isFacingLeft;
+                }
+
                 _wallJumpCooldown = 0f;
             }
         }

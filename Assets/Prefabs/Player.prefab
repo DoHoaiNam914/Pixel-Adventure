@@ -171,6 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e4e7cd767e0e2f4695a3b247e13fbb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _currentLevel: 1
   _scoreText: {fileID: 0}
   _gameOverPanel: {fileID: 0}
   _deadScoreText: {fileID: 0}

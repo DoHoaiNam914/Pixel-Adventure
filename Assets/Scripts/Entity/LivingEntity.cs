@@ -7,7 +7,7 @@ public class LivingEntity : MonoBehaviour
     private SpriteRenderer _spriteRenderer;
 
     [SerializeField]
-    private GameObject[] _waypoints = new GameObject[2];
+    private GameObject[] _waypoints = new GameObject[8];
     [SerializeField]
     private float _moveSpeed = 2f;
 
