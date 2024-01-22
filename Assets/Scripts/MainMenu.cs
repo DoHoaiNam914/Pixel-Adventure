@@ -12,6 +12,8 @@ public class MainMenu : MonoBehaviour
     private GameObject _mainMenu;
     [SerializeField]
     private Button _startButton;
+    [SerializeField]
+    private Button _quitButton;
 
 
     [Header("Level Menu")]
@@ -65,6 +67,7 @@ public class MainMenu : MonoBehaviour
     void Start()
     {
         _startButton.onClick.AddListener(OnStartButtonClick);
+        _quitButton.onClick.AddListener(() => Application.Quit());
         _homeButton.onClick.AddListener(OnHomeButtonClick);
     }
 }

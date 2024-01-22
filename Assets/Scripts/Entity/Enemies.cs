@@ -25,6 +25,7 @@ public class Enemies : MonoBehaviour
         Invoke("Destroy", 2f);
     }
 
+    // Start is called before the first frame update
     void Start()
     {
         _rigidbody = GetComponent<Rigidbody2D>();

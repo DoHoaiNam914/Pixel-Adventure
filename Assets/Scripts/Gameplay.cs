@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -15,6 +16,8 @@ public class Gameplay : MonoBehaviour
 
     [SerializeField]
     private Text _scoreText;
+    [SerializeField]
+    private GameObject _pausePanel;
 
     [Header("Game Over Scene")]
     [SerializeField]
@@ -151,14 +154,28 @@ public class Gameplay : MonoBehaviour
         }
     }
 
-    public void OnRestartButtonClick()
+    public void OnPauseButtonClick()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        EventSystem.current.SetSelectedGameObject(null);
+        Time.timeScale = 0f;
+        _pausePanel.SetActive(true);
+    }
+
+    public void OnResumeButtonClick()
+    {
+        EventSystem.current.SetSelectedGameObject(null);
+        _pausePanel.SetActive(false);
+        Time.timeScale = 1f;
     }
 
     public void OnHomeButtonClick()
     {
         SceneManager.LoadScene(0);
+    }
+
+    public void OnRestartButtonClick()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void OnNextLevelButtonClick()
@@ -191,7 +208,7 @@ public class Gameplay : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (_rigidbody.bodyType == RigidbodyType2D.Static)
+        if (_rigidbody.bodyType == RigidbodyType2D.Static || _pausePanel.activeInHierarchy)
         {
             return;
         }
@@ -274,6 +291,11 @@ public class Gameplay : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
+        if (_pausePanel.activeInHierarchy)
+        {
+            return;
+        }
+
         if (collision.gameObject.CompareTag("Traps") || collision.gameObject.CompareTag("Bullets") || (collision.gameObject.CompareTag("Enemies") && Vector2.Dot(collision.relativeVelocity, Vector2.up) <= 13f))
         {
             Die();
