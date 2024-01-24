@@ -171,16 +171,19 @@ public class Gameplay : MonoBehaviour
     public void OnHomeButtonClick()
     {
         SceneManager.LoadScene(0);
+        Time.timeScale = 1f;
     }
 
     public void OnRestartButtonClick()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Time.timeScale = 1f;
     }
 
     public void OnNextLevelButtonClick()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        Time.timeScale = 1f;
     }
 
     void Awake()
